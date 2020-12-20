@@ -7,9 +7,28 @@
 #include<time.h>
 #include<math.h>
 #include<ctime>
+#include<vector>
 
 using namespace std;
 
+void randomPath(int* path,int citiesNum) {
+    vector<int> tempNums;
+    for (int i = 1; i < citiesNum; i++)
+        tempNums.push_back(i);
+
+    path[0] = 0;
+    path[citiesNum] = 0;
+    int currentVertex;
+    vector<int> cleaningVector;
+    for (int i = 1; i < citiesNum; i++) {
+        currentVertex = rand() % tempNums.size();
+        vector<int>::iterator it;
+        it = tempNums.begin() + currentVertex;
+        path[i] = tempNums.at(currentVertex);
+        tempNums.erase(it);
+       
+    }
+}
 
 void printPath(int arr[], int size) {
 
@@ -198,33 +217,55 @@ int main() {
         
         
         
-      printPath(currentPath, citiesNum+1);
-      cout << "Koszt to " << countCost(currentPath, citiesNum, cityMatrix) << endl;
-        clock_t start = clock();
+     
+     
+     randomPath(currentPath, citiesNum);
+     cout << "Koszt to " << countCost(currentPath, citiesNum, cityMatrix) << endl;
+     printPath(currentPath, citiesNum + 1);
+     int i, u,m;
+     i = 0;
+     u = 100;
+     m = 5;
+     clock_t start = clock();
         /*   tutaj zaczyna sie algorytm TS    */
-        for (int i = 0; i < citiesNum*citiesNum*citiesNum; i++) {
-            newNeighbours(currentPath, citiesNum, tabuList, cityMatrix, 5, tabuPeroid);
-            if (countCost(currentPath, citiesNum, cityMatrix) < countCost(bestPath, citiesNum, cityMatrix))
+
+        while(i<u) {
+
+            newNeighbours(currentPath, citiesNum, tabuList, cityMatrix, 1, tabuPeroid);
+            if (countCost(currentPath, citiesNum, cityMatrix) < countCost(bestPath, citiesNum, cityMatrix)) {
                 copyArray(bestPath, currentPath, citiesNum + 1);
+                i = 0;
+            }
+            else
+                i++;
+
+            if (i == m) {
+                randomPath(currentPath, citiesNum);
+                for (int j = 0; j < tabuPeroid; j++)
+                   decrementTabuList(tabuList, citiesNum);
+              
+            }
+
             decrementTabuList(tabuList, citiesNum);
-           }
+           
+        }
         
 
            
            
         
 
-      
+     
+     
         /*   tutaj konczy  sie algorytm TS     */
 
         clock_t stop = clock();
         double  elapsed = (double)(stop - start) / CLOCKS_PER_SEC;
-        cout << elapsed << " [s]";
+        cout << elapsed << " [s]" << endl;
 
         printPath(bestPath, citiesNum + 1);
         cout << "Koszt best : " << countCost(bestPath, citiesNum, cityMatrix) << endl;
-        printPath(currentPath, citiesNum + 1);
-        cout << "Koszt current : " << countCost(currentPath, citiesNum, cityMatrix) << endl;
+        cout << "Koszt optymalny : " << hamiltonOpt << endl;
         double PRD =((double)countCost(bestPath, citiesNum, cityMatrix) /(double) hamiltonOpt);
         cout << "PRD = " << PRD * 100 << " % " << endl;
         /*        zwalnianie pamieci               */
