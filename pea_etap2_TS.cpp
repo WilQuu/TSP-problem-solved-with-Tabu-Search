@@ -26,7 +26,6 @@ void randomPath(int* path,int citiesNum) {
         it = tempNums.begin() + currentVertex;
         path[i] = tempNums.at(currentVertex);
         tempNums.erase(it);
-       
     }
 }
 
@@ -56,12 +55,12 @@ int countCost(int* path, int citiesNum, int** cityMatrix) {
 }
 
 bool aspirationCriteria(int* path, int* currentPath, int difference, int citiesNum, int** cityMatrix) {
-    if (countCost(currentPath, citiesNum , cityMatrix) - countCost(path, citiesNum , cityMatrix) > difference)
+    if (countCost(currentPath, citiesNum , cityMatrix) - countCost(path, citiesNum , cityMatrix) >= difference)
         return true;
     else
         return false;
 }
-/* nalezy poprawic to ze jak sa taie same indeksy i oraz j to zeby nie swapowac ich !*/
+
 void newNeighbours(int* path, int citiesNum,int** tabuList,int** cityMatrix,int diff,int tabuPeroid) {
     int* tempPath = new int[citiesNum + 1]; // tablica przechowujaca oryginalna tablice path, aby jej nie zmieniac 
     int* nextPath = new int[citiesNum + 1];
@@ -204,7 +203,8 @@ int main() {
         }
         copyArray(bestPath, currentPath, citiesNum + 1);
 
-        int iterationNum = citiesNum * citiesNum * citiesNum;
+        //int iterationNum = citiesNum * citiesNum * citiesNum;
+        double PRD;
 
      /* for (int i = 0; i < citiesNum-1; i++) {
             for (int j = 0; j < citiesNum-1; j++) {
@@ -220,21 +220,26 @@ int main() {
      
      
      randomPath(currentPath, citiesNum);
-     cout << "Koszt to " << countCost(currentPath, citiesNum, cityMatrix) << endl;
+     cout << "Koszt sciezki startowej " << countCost(currentPath, citiesNum, cityMatrix) << endl;
      printPath(currentPath, citiesNum + 1);
+     cout << "------------" << endl;
      int i, u,m;
      i = 0;
-     u = 100;
-     m = 5;
+     u = citiesNum*citiesNum ;
+     m = citiesNum/2 ;
      clock_t start = clock();
         /*   tutaj zaczyna sie algorytm TS    */
 
         while(i<u) {
 
-            newNeighbours(currentPath, citiesNum, tabuList, cityMatrix, 1, tabuPeroid);
+            newNeighbours(currentPath, citiesNum, tabuList, cityMatrix, 3, tabuPeroid);
             if (countCost(currentPath, citiesNum, cityMatrix) < countCost(bestPath, citiesNum, cityMatrix)) {
                 copyArray(bestPath, currentPath, citiesNum + 1);
                 i = 0;
+                PRD = ((double)countCost(bestPath, citiesNum, cityMatrix) / (double)hamiltonOpt);
+                cout << "PRD = " << PRD * 100 << " % " << endl;
+                printPath(bestPath, citiesNum + 1);
+                cout << "--------------" << endl;
             }
             else
                 i++;
@@ -245,16 +250,11 @@ int main() {
                    decrementTabuList(tabuList, citiesNum);
               
             }
-
+            
             decrementTabuList(tabuList, citiesNum);
            
         }
-        
-
-           
-           
-        
-
+      
      
      
         /*   tutaj konczy  sie algorytm TS     */
@@ -265,8 +265,8 @@ int main() {
 
         printPath(bestPath, citiesNum + 1);
         cout << "Koszt best : " << countCost(bestPath, citiesNum, cityMatrix) << endl;
-        cout << "Koszt optymalny : " << hamiltonOpt << endl;
-        double PRD =((double)countCost(bestPath, citiesNum, cityMatrix) /(double) hamiltonOpt);
+       
+         PRD =((double)countCost(bestPath, citiesNum, cityMatrix) /(double) hamiltonOpt);
         cout << "PRD = " << PRD * 100 << " % " << endl;
         /*        zwalnianie pamieci               */
         for (int i = 0; i < citiesNum; i++)
